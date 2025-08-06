@@ -1,15 +1,10 @@
 # router1x3
 
 <p align="center">
-<img width="680" height="560" alt="RouterNetwork drawio" src="https://github.com/user-attachments/assets/7f50b384-aaf5-43a0-9196-d6adc83336c4" />
-</p>
-
-ROUTER is a device that connects two or more networks (or computer LANs) and forwards data packets between computer networks (or from Source Server Network to Destination Client Network). It is an OSI layer 3 routing device. Router 1x3 has one ingress  and three egress . As the definition suggests, the packet from a source network is routed to one of the destination networks.
-
-<p align="center">
 <img width="680" height="442" alt="RouterTopBlock drawio" src="https://github.com/user-attachments/assets/1514ea33-d076-4b04-b2de-fc398db186d4" />
 </p>
 
+ROUTER is a device that connects two or more networks (or computer LANs) and forwards data packets between computer networks (or from Source Server Network to Destination Client Network). It is an OSI layer 3 routing device. Router 1x3 has one ingress and three egress . As the definition suggests, the packet from a source network is routed to one of the destination networks.<br/>
 ## Router-Packet
 ### Packet Format
 The Packet consists of 3 parts i.e. Header, Payload and Parity such that each ID of 8 bits width and the length of the payload can be extended between 1 byte to 63 bytes.<br/>
@@ -36,14 +31,14 @@ This field contains the security check of the packet. It is calculated as bitwis
 
 **Characteristics**:<br/>
   - *TestBench Note*:
-    - All input signals are active high except active low reset and are synchronized to the falling edge of the clock. This is because the DUT router is sensitive to the rising edge of the clock. Therefore, in the testbench, driving input signals on the falling edge ensure adequate setup and hold time. But in the SystemVerilog/UVM-based testbench, the clocking block can be used to drive the signals on the positive edge of the clock itself and thus avoids metastability.<br/>
-    - The packet_valid signal is asserted on the same clock edge when the header byte is driven onto the input data bus.<br/>
-    - Since the header byte contains the address, this tells the router to which output channel the packet should be routed (data_out_0, data_out_1, data_out_2).<br/>
+    - All input signals are active high except active low reset and are synchronized to the falling edge of the `clock`. This is because the DUT router is sensitive to the rising edge of the clock. Therefore, in the testbench, driving input signals on the falling edge ensure adequate setup and hold time. But in the SystemVerilog/UVM-based testbench, the clocking block can be used to drive the signals on the positive edge of the clock itself and thus avoids metastability.<br/>
+    - The `packet_valid` signal is asserted on the same clock edge when the header byte is driven onto the input data bus.<br/>
+    - Since the header byte contains the address, this tells the router to which output channel the packet should be routed (`data_out_0`, `data_out_1`, `data_out_2`).<br/>
     - Each subsequent byte of the payload after the header byte should be driven on the input data bus for every new falling edge of clock.<br/>
-    - After the last payload byte has been driven, on the next falling clock, the packet_valid signal must be de-asserted, and the packet parity byte should be driven. This signals the completion of the packet.<br/>
+    - After the last payload byte has been driven, on the next falling clock, the `packet_valid` signal must be de-asserted, and the packet parity byte should be driven. This signals the completion of the packet.<br/>
     - The testbench shouldn't drive any bytes when a busy signal is detected instead it should hold the last driven value.<br/>
-    - The "busy" signal when asserted drops any incoming byte of data.<br/>
-    - The "err" signal is asserted when a packet parity mismatch is detected.<br/>
+    - The `busy` signal when asserted drops any incoming byte of data.<br/>
+    - The `err` signal is asserted when a packet parity mismatch is detected.<br/>
 ## Router-Output Protocol
 
 <p align="center">
@@ -53,12 +48,13 @@ This field contains the security check of the packet. It is calculated as bitwis
 **Characteristics**:<br/>
 - *TestBench Note*:
   - All output signals are active high and are synchronized to the rising edge of the clock.<br/>
-  - Each output port data_out_x (data_out_0, data_out_1, data_out_2) is internally buffered by a FIFO of size 16x9.<br/>
-  - The router asserts the vld_out_x (vld_out_0, vld_out_1, vld_out_2) signal when valid data appears on the data_out_x (data_out_0, data_out_1, data_out_2) output bus. This is a signal to the receiver's client which indicates that data is available on a particular output data bus.<br/>
-  - The packet receiver will then wait until it has enough space to hold the bytes of the packet and then respond with the assertion of the read_enb_x (read_enb_0, read_enb_1, read_enb_2) signal.<br/>
-  - The read_enb_x (read_enb_0, read_enb_1, read_enb_2) input signal can be asserted on the falling clock edge in which data are read from the data_out_x (data_out_0, data_out_1, data_out_2) bus.<br/>
-  - The read_enb_x (read_enb_0, read_enb_1, read_enb_2) must be asserted within 30 clock cycles of vld_out_x (vld_out_0, vld_out_1, vld_out_2) being asserted else time-out occurs, which resets the FIFO.<br/>
-  - The  data_out_x bus will be tri-ststed during a scenario when a packet's byte is lost due to time-out condition.<br/>
+  - Each output port `data_out_x` (`data_out_0`, `data_out_1`, `data_out_2`) is internally buffered by a FIFO of size 16x9.<br/>
+  - The router asserts the `vld_out_x` (`vld_out_0`, `vld_out_1`, `vld_out_2`) signal when valid data appears on the `data_out_x` (`data_out_0`, `data_out_1`, `data_out_2`) output bus. This is a signal to the receiver's client which indicates that data is available on a particular output data bus.<br/>
+  - The packet receiver will then wait until it has enough space to hold the bytes of the packet and then respond with the assertion of the `read_enb_x` ( `read_enb_0`, `read_enb_1`, `read_enb_2`) signal.<br/>
+  - The `read_enb_x` (`read_enb_0`, `read_enb_1`, `read_enb_2`) input signal can be asserted on the falling clock edge in which data are read from the `data_out_x` (`data_out_0`, `data_out_1`, `data_out_2`) bus.<br/>
+  - The `read_enb_x` (`read_enb_0`, `read_enb_1`, `read_enb_2`) must be asserted within 30 clock cycles of `vld_out_x` (`vld_out_0`, `vld_out_1`, `vld_out_2`) being asserted else time-out occurs, which resets the FIFO.<br/>
+  - The  `data_out_x` bus will be tri-ststed during a scenario when a packet's byte is lost due to time-out condition.<br/>
 
-## Important Note
-This Specification is provided by Maven-Silicon under their [Terms and Conditions](https://www.maven-silicon.com/terms-and-conditions/)
+##
+> [!IMPORTANT]
+> This Specification is provided by Maven-Silicon under their [Terms and Conditions](https://www.maven-silicon.com/terms-and-conditions/)
