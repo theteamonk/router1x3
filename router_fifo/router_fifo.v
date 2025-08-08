@@ -8,8 +8,8 @@ Author Name :      Chaitra
 Version     :      1.0
 
 Width allocation:
-  8     7 6 5 4 3 2    1 0
-parity    payload     header
+  8     	7 6 5 4 3 2    1 0
+lfd_state    payload      header
 ********************************************************************************************/
 
 module router_fifo(clock, resetn, data_in, read_enb, write_enb, 
@@ -85,8 +85,8 @@ always@(posedge clock)
       	 
       else if(write_enb && !full)	//if the fifo is not full and there is availability of some location and write_enb is enabled
          begin
-            {mem[wr_ptr[3:0]][8], mem[wr_ptr[3:0]][7:0]} <= {temp, data_in}; //{wherever write pointer is pointing and 9th bit location(lfd_state bit), 
-																										  //wherever write pointer is pointing and 8 bit locations}
+			 {mem[wr_ptr[3:0]][8], mem[wr_ptr[3:0]][7:0]} <= {temp, data_in}; 	//{write pointer pointing at 9th bit location(lfd_state bit), 
+			 																	//write pointer pointing at 8 bit locations[7:0]}
             wr_ptr <= wr_ptr + 1'b1;
          end
 	end
